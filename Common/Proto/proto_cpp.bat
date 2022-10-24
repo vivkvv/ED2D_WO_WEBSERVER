@@ -1,0 +1,1 @@
+c:\Users\vvovk\e2d_utils\protobuf-3.6.1\bin_output\Release\protoc.exe --proto_path=. --cpp_out=.\ .\client_listener.proto

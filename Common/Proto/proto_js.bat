@@ -1,0 +1,1 @@
+c:\Users\vvovk\e2d_utils\protobuf-3.6.1\bin_output\Release\protoc.exe --proto_path=. --js_out=library=e2d,binary:../../WebClient/js ./client_listener.proto

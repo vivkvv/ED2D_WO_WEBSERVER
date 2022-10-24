@@ -1,0 +1,1 @@
+emcc -o function.html d:\Temp\emcc_experiments\hello_function.cpp -O3 -s WASM=1 -s EXPORTED_FUNCTIONS="['_int_sqrt']" -s NO_EXIT_RUNTIME=1  -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwarp']"

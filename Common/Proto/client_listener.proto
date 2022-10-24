@@ -1,0 +1,250 @@
+syntax = "proto3";
+
+message RoomInfo {
+	enum GameStatusEnum {
+		gseNone = 0;
+		gseWaiting = 1;
+		gsePlaying = 2;
+	}
+
+	string roomName = 1;	
+	GameStatusEnum gameStatus = 2;
+	int32 roomSize = 3;
+	int32 waitingSize = 4;
+}
+
+message ResponceOnGameInvitation {
+	bool responce = 1;
+	int32 ticket = 2;
+	string clientIp = 3;
+	int32 clientPort = 4;
+}
+
+message ResponceOnGameView {
+	bool responce = 1;
+	int32 ticket = 2;	
+	string clientIp = 3;
+	int32 clientPort = 4;
+}
+
+message StartGame {
+	int32 ticket = 1;
+}
+
+message OneChargeInfo {
+	enum Charge2DType {
+		ctStatic = 0;
+		ctDynamic = 1;
+	}
+	int32 id = 1;
+	Charge2DType type = 2;
+	float m = 3;
+	float charge = 4;
+	float x = 5;
+	float y = 6;
+	float vx = 7;
+	float vy = 8;
+	float fex = 9;
+	float fey = 10;
+	float fbx = 11;
+	float fby = 12;
+}
+
+enum ShowPaletteType {
+	sptDiscrete = 0;
+	sptContinuous = 1;
+}
+
+message ShowStruct {
+	ShowPaletteType paletteType = 1;
+	string paletteName = 2;
+}
+
+message SceneGeometry {
+	float width = 1;
+	float height = 2;
+	float qulon = 3;
+	float lightVelocity = 4;
+	bool ifMagnetic = 5;
+	ShowStruct forcesShowStruct = 6;
+	ShowStruct eqPotentialsShowStruct = 7;
+}
+
+message RTCGameClientRequest {
+	int32 id = 1;
+}
+
+message RTCGameAdminRequest {
+	string gameName = 1;
+	int32 roomSize = 2;
+}
+
+message PlayGameRequest {
+	string ip = 1;
+	int32 port = 2;
+}
+
+message ViewGameRequest {
+	string ip = 1;
+	int32 port = 2;
+}
+
+message RTCAdmin2ClientOffer {
+	int32 gameRTCID = 1;
+	string offer = 2;
+}
+
+message RTCClient2AdminAnswer {
+	int32 gameRTCID = 1;
+	string answer = 2;
+}
+
+message ClientQueryRequest {
+	oneof message {
+		PlayGameRequest playRequest = 1;
+		ViewGameRequest	viewRequest = 2;
+		RTCGameAdminRequest rtcAdminRequest = 3;
+		RTCGameClientRequest rtcClientRequest = 4;
+		RTCAdmin2ClientOffer rtcOffer = 5;
+		RTCClient2AdminAnswer rtcAnswer = 6;
+	}
+}
+
+message RoomToClient {
+	int32 packetId = 1;
+	repeated OneChargeInfo chargeInfo = 2;
+}
+
+message GameState {
+	int32 roomPort = 1;
+	RoomInfo roomInfo = 2;
+}
+
+message GameInfo {
+	SceneGeometry geometry = 1;
+	int32 currentChargeId = 2;
+}
+
+message RoomWrappedToClientMessage {
+	oneof message {
+		RoomToClient roomToClient = 1;
+		GameInfo gameInfo = 2;
+	}
+}
+
+message WebRTCGameInfo {
+	string url = 1;
+	int32 gameid = 2;	
+	string forcePalette = 3;
+	string eqPotPalette = 4;
+}
+
+message WebRTCAdminToClientMessage {
+	oneof message {
+		WebRTCGameInfo rtcGameInfo = 1;
+	}
+}
+
+message RoomWrappedMessage {
+	oneof message {
+		RoomInfo roomInfo = 1;
+		ResponceOnGameInvitation responceInvitation = 2;
+		ResponceOnGameView responceView = 3;
+		StartGame startGame = 4;
+	}
+}
+
+message InvitationToPlayGame
+{
+	int32 clientPort = 1;
+	string clientIp = 2;
+	int32 ticket = 3;
+}
+
+message InvitationToViewGame
+{
+	int32 clientPort = 1;
+	string clientIp = 2;
+	int32 ticket = 3;
+}
+
+message ListenerToClientGamesStates {
+	repeated GameState gameState = 1;
+}
+
+enum WebRTCPlayerStatus {
+	rtcPlayerNone = 0;
+	rtcPlayerAdmin = 1;
+	rtcPlayerClient = 2;
+}
+
+message rtcGameState {
+	int32 gameRTCID = 1;
+	string gameName = 2;
+	int32 roomSize = 3;
+	int32 currentPlayersCount = 4;
+	WebRTCPlayerStatus playerStatus = 5;
+}
+
+message ListenerToClientsWebRTCGamesStates {
+	repeated rtcGameState rtcState = 1;
+}
+
+enum WebRTCGameRefuseReasons {
+	rtcRefuseNoGameWithId = 0;
+	rtcRefuseRoomIsFull = 1;
+}
+
+message ListenerToClientsWebRTCRefuse {
+	int32 gameRTCID = 1;
+	WebRTCGameRefuseReasons refuseReason = 2;
+}
+
+message ListenerToClientWrappedMessage {
+	oneof message {
+		InvitationToPlayGame invitationToPlay = 1;
+		ListenerToClientGamesStates states = 2;
+		InvitationToViewGame invitationToView = 3;
+		ListenerToClientsWebRTCGamesStates rtcStates = 4;
+		ListenerToClientsWebRTCRefuse rtcRefuse = 5;
+		RTCAdmin2ClientOffer rtcOffer = 6;
+		RTCClient2AdminAnswer rtcAnswer = 7;
+	}
+}
+
+message ServerWrappedMessage {
+	oneof message {
+		InvitationToPlayGame invitationToPlay = 1;		
+		InvitationToViewGame invitationToView = 2;
+	}
+}
+
+message KeyboardKey {
+	int32 keyboardKey = 1; // 0 - PageUP, 1 - PageDown, 2 - ArrowUp, 3 - ArrowDown, 4 - get info
+}
+
+message Ping {
+	int32 ping = 1;
+}
+
+message SetQulon {
+	float qulon = 1;
+}
+
+message SetLightVelocity {
+	float lightVelocity = 1;
+}
+
+message SetMagneticCalculated {
+	bool magneticCalculated = 1;
+}
+
+message ClientWrappedMessage {
+	oneof message {
+		KeyboardKey key = 1;
+		Ping ping = 2;
+		SetQulon qulon = 3;
+		SetLightVelocity lightVelocity = 4;
+		SetMagneticCalculated magneticCalculated = 5;
+	}
+}
